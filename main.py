@@ -15,11 +15,18 @@ TEXT = (
 
 
 def main():
+    # Gate self-check: the bounty requires UTF-8, 1-280 code points,
+    # and more than whitespace; fail loudly instead of writing bad output.
+    data = TEXT.encode("utf-8")
+    if not 1 <= len(TEXT) <= 280 or not TEXT.strip():
+        raise SystemExit("entry text fails the 1-280 code point gate")
     out_dir = os.environ.get("MAKEFUN_OUTPUT_DIR", "/output")
     os.makedirs(out_dir, exist_ok=True)
     path = os.path.join(out_dir, "entry.txt")
-    with open(path, "w", encoding="utf-8") as f:
-        f.write(TEXT)
+    tmp = path + ".tmp"
+    with open(tmp, "wb") as f:
+        f.write(data)
+    os.replace(tmp, path)
 
 
 if __name__ == "__main__":
